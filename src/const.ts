@@ -1,8 +1,6 @@
 import * as path from "path";
 
-export const APP_NAME = "juli";
-export const WORKLOGS_FILE = "worklogs.json";
-export const CREDENTIALS_FILE = "credentials.json";
+export const APP_NAME = "ULI";
 
 export const CREATE_PATH = (fileName: string) => {
   // Win
