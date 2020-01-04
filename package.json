@@ -1,6 +1,6 @@
 {
   "name": "juli",
-  "description": "Jira Universal Log Import",
+  "description": "Jira Universal Log Importer",
   "version": "0.0.1",
   "main": "dist/command.js",
   "author": "Daniel Huth",
@@ -13,7 +13,6 @@
   "bin": "./dist/command.js",
   "preferGlobal": true,
   "devDependencies": {
-    "@types/fs-extra": "^8.0.1",
     "@types/node": "^13.1.2",
     "@types/readline-sync": "^1.4.3",
     "ts-node": "^8.5.4",
@@ -24,7 +23,6 @@
     "axios": "^0.19.0",
     "commander": "^4.0.1",
     "date-fns": "^2.8.1",
-    "fs-extra": "^8.1.0",
     "readline-sync": "^1.4.10"
   }
 }

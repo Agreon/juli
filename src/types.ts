@@ -13,3 +13,16 @@ export interface IWorkEntry {
 export interface IApiConnector {
   importLogs(days: IWorkDay[]): Promise<void>;
 }
+
+export interface IWorklogEntry {
+  id: string;
+  date: Date;
+}
+
+export interface IStore<TCRED_TYPE> {
+  getCredentials(): TCRED_TYPE | null;
+  setCredentials(credentials: TCRED_TYPE): void;
+
+  getExistingEntries(): IWorklogEntry[] | null;
+  setExistingEntries(entires: IWorklogEntry[]): void;
+}

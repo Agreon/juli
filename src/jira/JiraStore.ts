@@ -1,40 +1,35 @@
-import { GlobalConfigManager } from "../util/GlobalConfigManager";
 import { IJiraCredentials } from "./JiraClient";
-
-interface IWorklogEntry {
-  id: string;
-  date: Date;
-}
-
-const APP_NAME = "juli";
-const WORKLOGS_FILE = "worklogs.json";
-const CREDENTIALS_FILE = "credentials.json";
+import { readFileSync, writeFileSync } from "fs";
+import { IStore, IWorklogEntry } from "../types";
+import { CREATE_PATH, CREDENTIALS_FILE, WORKLOGS_FILE } from "../const";
 
 /**
  * TODO: Handle unauthorized errors?
  */
-export class JiraStore {
-  public static getCredentials(): IJiraCredentials | null {
+export class JiraStore implements IStore<IJiraCredentials> {
+  public getCredentials(): IJiraCredentials | null {
     try {
-      return GlobalConfigManager.getSync(APP_NAME, CREDENTIALS_FILE);
+      const file = readFileSync(CREATE_PATH(CREDENTIALS_FILE), "UTF-8");
+      return JSON.parse(file);
     } catch (e) {
       return null;
     }
   }
 
-  public static setCredentials(credentials: IJiraCredentials) {
-    return GlobalConfigManager.setSync(APP_NAME, CREDENTIALS_FILE, credentials);
+  public setCredentials(credentials: IJiraCredentials) {
+    writeFileSync(CREATE_PATH(CREDENTIALS_FILE), JSON.stringify(credentials));
   }
 
-  public static getExistingEntries(): IWorklogEntry[] | null {
+  public getExistingEntries(): IWorklogEntry[] | null {
     try {
-      return GlobalConfigManager.getSync(APP_NAME, WORKLOGS_FILE);
+      const file = readFileSync(CREATE_PATH(WORKLOGS_FILE), "UTF-8");
+      return JSON.parse(file);
     } catch (e) {
       return null;
     }
   }
 
-  public static setExistingEntries(entries: IWorklogEntry[]) {
-    return GlobalConfigManager.setSync(APP_NAME, WORKLOGS_FILE, entries);
+  public setExistingEntries(entries: IWorklogEntry[]) {
+    writeFileSync(CREATE_PATH(WORKLOGS_FILE), JSON.stringify(entries));
   }
 }

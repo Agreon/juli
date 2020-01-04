@@ -6,10 +6,11 @@ import { JiraClient, IJiraLogInput, IJiraCredentials } from "./JiraClient";
 
 export class JiraApiConnector implements IApiConnector {
   private client: JiraClient = new JiraClient();
+  private store: JiraStore = new JiraStore();
   private credentials: IJiraCredentials;
 
   constructor(saveCredentials: boolean = false) {
-    this.credentials = JiraStore.getCredentials();
+    this.credentials = this.store.getCredentials();
     if (!this.credentials) {
       this.credentials = JiraApiConnector.updateCredentials(saveCredentials);
     }
@@ -30,7 +31,7 @@ export class JiraApiConnector implements IApiConnector {
 
     if (saveCredentials) {
       console.log("Saving credentials");
-      JiraStore.setCredentials(credentials);
+      new JiraStore().setCredentials(credentials);
     }
 
     return credentials;
@@ -70,47 +71,6 @@ export class JiraApiConnector implements IApiConnector {
       dateStarted: dateWithMinutes
     };
   };
-
-  /**
-   * TODO: Maybe not possible like this
-   * => Save created ids in GlobalConfig and then fetch by them
-   * @param days
-   */
-  /*private async clearEntries(days: IWorkDay[]) {
-    const existingEntries = GlobalConfigManager.getSync("juli", "entries.json");
-
-    if (!existingEntries) {
-      return;
-    }
-
-    try {
-      const logs = await axios.get(
-        WORKLOGS_URL(
-          parseInt(
-            parse("01.01.20", "dd.MM.yy", new Date())
-              .getTime()
-              .toFixed(0)
-          )
-        ),
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: this.cookie
-          }
-        }
-      );
-      const logsOfWeek = await axios.post(ALL_WORKLOGS_URL, {
-        ids: logs.data.values.map(v => v.worklogId)
-      });
-      console.log(logsOfWeek);
-    } catch (e) {
-      console.log(e);
-      if (e.response.headers["x-seraph-loginreason"]) {
-        throw new Error("CAPTCHA ERROR");
-      }
-      throw new Error("Could not get worklogs");
-    }
-  }*/
 
   private async createWorklogs(inputs: IJiraLogInput[]): Promise<void> {
     await Promise.all(inputs.map(log => this.client.createWorklog(log)));
