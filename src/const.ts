@@ -1,6 +1,6 @@
 import * as path from "path";
 
-export const APP_NAME = "ULI";
+export const APP_NAME = "juli";
 
 export const CREATE_PATH = (fileName: string) => {
   // Win
@@ -8,10 +8,10 @@ export const CREATE_PATH = (fileName: string) => {
     return path.join(process.env.APPDATA, APP_NAME, fileName);
   }
   // Unix
-  else if (process.env.HOME) {
+  if (process.env.HOME) {
     return path.join(process.env.HOME, `.${APP_NAME}`, fileName);
-  } else {
-    console.warn("You don't have a supported OS");
-    return path.join(__filename, "../config", APP_NAME, fileName);
   }
+
+  console.warn("You don't have a supported OS");
+  return path.join(__filename, "../config", APP_NAME, fileName);
 };

@@ -1,8 +1,8 @@
 {
-  "name": "uli",
-  "description": "Universal Log Importer",
+  "name": "juli",
+  "description": "Jira Universal Log Importer",
   "repository": {
-    "url": "https://github.com/Agreon/ULI"
+    "url": "https://github.com/Agreon/juli"
   },
   "version": "0.0.1",
   "main": "dist/command.js",
@@ -11,7 +11,8 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "yarn clean; tsc; cp src/command.js dist/command.js",
-    "clean": "rimraf ./dist; rimraf ./tsconfig.tsbuildinfo"
+    "clean": "rimraf ./dist; rimraf ./tsconfig.tsbuildinfo",
+    "test": "tslint --project ."
   },
   "bin": "./dist/command.js",
   "preferGlobal": true,
@@ -19,8 +20,14 @@
     "@types/fs-extra": "^8.0.1",
     "@types/node": "^13.1.2",
     "@types/readline-sync": "^1.4.3",
+    "prettier": "^1.16.4",
     "rimraf": "^2.6.3",
     "ts-node": "^8.5.4",
+    "tslint": "^5.20.1",
+    "tslint-config-airbnb": "^5.11.1",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-etc": "^1.7.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.7.4"
   },
   "dependencies": {

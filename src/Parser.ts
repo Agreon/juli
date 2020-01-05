@@ -1,7 +1,5 @@
-import { parse, isValid } from "date-fns";
 import { IWorkDay, IWorkEntry } from "./types";
-
-const fallBack = new Date();
+import { parseDate } from "./jira/util";
 
 export class Parser {
   public static parse(text: string): IWorkDay[] {
@@ -12,10 +10,11 @@ export class Parser {
 
     return days.map(day => {
       const first = day.split("\n")[0].trim();
-      const date = parse(first, "dd.MM.yy", fallBack);
+      const date = parseDate(first, ["d.M.", "d.M.yy"]);
 
-      if (date == fallBack) {
-        throw new Error("Could not parse date");
+      if (!date) {
+        console.error(`Could not parse date ${first}`);
+        process.exit(1);
       }
 
       return {
@@ -42,16 +41,17 @@ export class Parser {
         startTime = this.parseTime(lines[i]);
         continue;
       }
-      if (!description) {
+      if (!description || !ticketId) {
         const parts = lines[i].split(":");
         // Add existing description if just adding something to a worklog
         if (parts.length === 1) {
           ticketId = parts[0].replace("+", "").trim();
           const existingEntry = entries.find(e => e.ticketId === ticketId);
           if (!existingEntry) {
-            throw new Error(
-              `Missing Description for ${ticketId} in Line ${i + 1}`
+            console.error(
+              `Missing Description for ${ticketId} on day ${startTime}`
             );
+            process.exit(1);
           }
           description = existingEntry.description;
         } else {
@@ -88,23 +88,12 @@ export class Parser {
   }
 
   private static parseTime(text: string): Date {
-    const date = text.replace("+", "").trim();
-    let time = null;
+    const trimmed = text.replace("+", "").trim();
+    const time = parseDate(trimmed, ["H", "H:m"]);
 
-    if (date.length === 1) {
-      time = parse(date, "H", fallBack);
-    } else if (date.length === 2) {
-      time = parse(date, "HH", fallBack);
-    } else if (date.length === 4) {
-      time = parse(date, "H:mm", fallBack);
-    } else if (date.length === 5) {
-      time = parse(date, "HH:mm", fallBack);
-    } else {
-      throw new Error(`Time ${date} not in right format`);
-    }
-
-    if (!isValid(time) || time == fallBack) {
-      throw new Error(`Time ${date} not in right format`);
+    if (!time) {
+      console.error(`Time ${trimmed} not in right format`);
+      process.exit(1);
     }
 
     return time;

@@ -1,12 +1,8 @@
-import { Parser } from "./Parser";
-import { readFileSync } from "fs";
-import { JiraApiConnector } from "./jira/JiraApiConnector";
 import * as commander from "commander";
+import { readFileSync } from "fs";
+import { Parser } from "./Parser";
+import { JiraApiConnector } from "./jira/JiraApiConnector";
 
-/**
- * TODO:
- * + Update cli structure
- */
 export const execute = () => {
   let executed = false;
 
@@ -15,6 +11,14 @@ export const execute = () => {
     .description("Update the saved credentials")
     .action(() => {
       JiraApiConnector.updateCredentials(true);
+      executed = true;
+    });
+
+  commander
+    .command("updateHost")
+    .description("Update the saved host")
+    .action(() => {
+      JiraApiConnector.updateHost();
       executed = true;
     });
 

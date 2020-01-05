@@ -3,7 +3,13 @@
     "baseUrl": ".",
     "rootDir": "src",
     "outDir": "dist",
-    "lib": ["dom", "es2017"]
+    "lib": ["dom", "es2017"],
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
   },
   "exclude": ["node_modules"],
   "include": ["./src/**/*.ts"]

@@ -1,0 +1,28 @@
+{
+  "extends": [
+    "tslint:latest",
+    "tslint-etc",
+    "tslint-config-airbnb",
+    "tslint-plugin-prettier",
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "prettier": true,
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-pascal-case"
+    ],
+    "object-shorthand-properties-first": false,
+    "member-access": false,
+    "no-implicit-dependencies": false,
+    "array-type": false,
+    "import-name": false,
+    "no-floating-promises": true,
+    "no-unused-declaration": true,
+    "ordered-imports": false,
+    "object-literal-sort-keys": false,
+    "no-console": false
+  }
+}
