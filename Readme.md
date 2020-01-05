@@ -64,5 +64,6 @@ You can execute the command multiple times to update your remote logs. If there 
 - Let the user specify a custom entry range
 - Add a default host for jira
 - Use a better Framework for CLI-Parsing
+- Improve error handling
 
 **If you want to help, visit the [Repo](https://github.com/Agreon/juli)**

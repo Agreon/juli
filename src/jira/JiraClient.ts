@@ -84,7 +84,7 @@ export class JiraClient {
         console.log(`No Ticket for ${item.issue.key} found`);
       } else {
         console.error("An unexpected Error occurred: \n");
-        console.log(e);
+        console.log(e.response.data);
       }
     }
     return null;
@@ -100,7 +100,7 @@ export class JiraClient {
       console.error(
         `Could not delete worklog ${log.id} for issue ${log.issueId}: \n`
       );
-      console.log(e);
+      console.log(e.response.data);
     }
   }
 

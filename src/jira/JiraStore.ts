@@ -38,7 +38,7 @@ export class JiraStore implements IStore<IJiraCredentials, IJiraWorklog> {
         encoding: "UTF-8",
         throws: false
       })
-      .map((entry: any) => ({
+      ?.map((entry: any) => ({
         id: entry.id,
         issueId: entry.issueId,
         date: new Date(entry.date)
