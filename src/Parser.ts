@@ -56,7 +56,10 @@ export class Parser {
           description = existingEntry.description;
         } else {
           ticketId = parts[0].replace("+", "").trim();
-          description = parts[1].trim();
+          description = parts
+            .slice(1)
+            .join(":")
+            .trim();
         }
 
         continue;

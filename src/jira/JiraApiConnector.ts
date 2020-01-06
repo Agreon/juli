@@ -106,7 +106,7 @@ export class JiraApiConnector implements IApiConnector {
       return;
     }
 
-    console.log("Clearing old logs");
+    console.log("Clearing old logs...");
     await Promise.all(relevantLogs.map(log => this.client.deleteWorklog(log)));
   }
 
@@ -131,7 +131,7 @@ export class JiraApiConnector implements IApiConnector {
   };
 
   private async createWorklogs(inputs: IJiraLogInput[]) {
-    console.log("Creating Worklogs");
+    console.log("Creating Worklogs...");
 
     const createdLogs = await Promise.all(
       inputs.map(log => this.client.createWorklog(log))

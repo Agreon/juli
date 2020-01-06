@@ -61,6 +61,8 @@ You can execute the command multiple times to update your remote logs. If there 
 
 ## Todo
 
+- Make the deletion of old items optional to not force the user to keep his logs for one week
+- Add the possibility to define reoccurring entries in a config
 - Let the user specify a custom entry range
 - Add a default host for jira
 - Use a better Framework for CLI-Parsing
