@@ -39,6 +39,7 @@ $ juli <timesheet-file> [Params]
 
 - Format of the date: `d.M.[YY]`
 - Format of the the time: `h[:m]`
+- `: <DESCRIPTION>` can be omitted, if there is an existing issue-definition on the same day already.
 
 **Example**
 
@@ -52,7 +53,11 @@ $ juli <timesheet-file> [Params]
 11
 ```
 
-You can execute the command multiple times to update your remote logs. If there are previous worklogs written by juli, the old versions will be deleted.
+### Be aware
+
+You can execute the command multiple times to update your remote logs. juli uses the specified logfile as a source of truth (for the last week). That means, **entries you delete in the logfile will be deleted in jira as well**, as long as they are in the current tempo week.
+
+Entries, that were added manually or through other tools are not affected by this.
 
 ### Additional commands
 
@@ -61,6 +66,7 @@ You can execute the command multiple times to update your remote logs. If there 
 
 ## Todo
 
+- Support One-line definitions.
 - Make the deletion of old items optional to not force the user to keep his logs for one week
 - Add the possibility to define reoccurring entries in a config
 - Let the user specify a custom entry range
