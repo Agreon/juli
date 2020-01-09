@@ -2,6 +2,7 @@ import * as commander from "commander";
 import { readFileSync } from "fs";
 import { Parser } from "./Parser";
 import { JiraApiConnector } from "./jira/JiraApiConnector";
+import { FormatError } from "./errors";
 
 export const execute = () => {
   let executed = false;
@@ -33,13 +34,19 @@ export const execute = () => {
     .action(async (file: string, obj: any) => {
       executed = true;
       const connector = new JiraApiConnector(obj.saveCredentials);
+      try {
+        const fileContent = readFileSync(file, "utf8");
+        const dates = Parser.parse(fileContent);
 
-      const fileContent = readFileSync(file, "utf8");
-      const dates = Parser.parse(fileContent);
-
-      await connector.importLogs(dates);
-
-      console.log("Import was successful");
+        await connector.importLogs(dates);
+        console.log("Import was successful");
+      } catch (e) {
+        console.error(e.message);
+        if (e instanceof FormatError) {
+          process.exit(128);
+        }
+        process.exit(1);
+      }
     })
     .parse(process.argv);
 

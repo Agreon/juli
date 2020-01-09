@@ -15,6 +15,7 @@ import {
   IJiraWorklog
 } from "./JiraClient";
 import { getLastThursday } from "./util";
+import { AuthenticationError } from "../errors";
 
 export class JiraApiConnector implements IApiConnector {
   private client: JiraClient;
@@ -68,7 +69,11 @@ export class JiraApiConnector implements IApiConnector {
 
   public async importLogs(days: IWorkDay[]) {
     console.log("Obtaining Cookie...");
-    await this.client.obtainCookie();
+    try {
+      await this.client.obtainCookie();
+    } catch (e) {
+      throw AuthenticationError.fromAxiosError(e);
+    }
 
     const preparedEntries = this.prepareEntries(days);
 
@@ -91,6 +96,7 @@ export class JiraApiConnector implements IApiConnector {
 
   /**
    * Clears logs that were previously written and are part of the current batch
+   * @param logs
    * @param onDays
    */
   private async clearOldLogs(
