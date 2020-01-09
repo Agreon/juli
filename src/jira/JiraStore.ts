@@ -1,12 +1,13 @@
 import * as fs from "fs-extra";
 import * as path from "path";
-import { IJiraCredentials, IJiraWorklog } from "./JiraClient";
+import { IJiraAlias, IJiraCredentials, IJiraWorklog } from "./JiraClient";
 import { IStore } from "../types";
 import { CREATE_PATH } from "../const";
 
 const HOST_FILE = path.join("jira", "host.json");
 const CREDENTIALS_FILE = path.join("jira", "credentials.json");
 const WORKLOGS_FILE = path.join("jira", "worklogs.json");
+const ALIAS_FILE = path.join("jira", "alias.json");
 
 export class JiraStore implements IStore<IJiraCredentials, IJiraWorklog> {
   public getHost(): string | null {
@@ -47,5 +48,16 @@ export class JiraStore implements IStore<IJiraCredentials, IJiraWorklog> {
 
   public setExistingEntries(entries: IJiraWorklog[]) {
     fs.outputJsonSync(CREATE_PATH(WORKLOGS_FILE), entries);
+  }
+
+  public setIssueAliases(entries: IJiraAlias) {
+    fs.outputJsonSync(CREATE_PATH(ALIAS_FILE), entries);
+  }
+
+  public getIssueAliases(): IJiraAlias | null {
+    return fs.readJsonSync(CREATE_PATH(ALIAS_FILE), {
+      encoding: "UTF-8",
+      throws: false
+    });
   }
 }

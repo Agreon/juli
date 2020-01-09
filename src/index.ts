@@ -6,6 +6,8 @@ import { FormatError } from "./errors";
 import { checkForUpdates } from "./util/checkForUpdates";
 import { Logger } from "./util/Logger";
 import { handleError } from "./util/handleError";
+import { JiraStore } from "./jira/JiraStore";
+import { InvalidArgumentError } from "./errors/InvalidArgumentError";
 
 export const execute = async () => {
   let executed = false;
@@ -26,6 +28,37 @@ export const execute = async () => {
     .action(() => {
       JiraApiConnector.updateHost();
       executed = true;
+    });
+
+  commander
+    .command("alias [pair]")
+    .description("Upsert an alias with <name>=[issueId]")
+    .action(async (alias: string) => {
+      executed = true;
+
+      const printAliases = (record: Record<string, string> | null) =>
+        record
+          ? Object.entries(record).forEach(([key, value]) =>
+              console.log(`${key}=${value}`)
+            )
+          : console.log("No aliases found");
+
+      if (!alias) {
+        const store = new JiraStore();
+        printAliases(await store.getIssueAliases());
+        return;
+      }
+
+      try {
+        const aliases = await JiraApiConnector.updateAlias(alias);
+        printAliases(aliases);
+      } catch (e) {
+        console.error(e.message);
+        if (e instanceof InvalidArgumentError) {
+          process.exit(129);
+        }
+        process.exit(1);
+      }
     });
 
   commander
@@ -54,7 +87,7 @@ export const execute = async () => {
       }
     });
 
-  commander.parse(process.argv);
+  await commander.parseAsync(process.argv);
 
   if (!executed) {
     Logger.error("Please specify a timesheet file");
