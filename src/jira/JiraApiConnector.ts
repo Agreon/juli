@@ -82,7 +82,9 @@ export class JiraApiConnector implements IApiConnector {
     const thursday = getLastThursday();
 
     return days
-      .filter(day => isAfter(day.date, thursday))
+      .filter(
+        day => isSameDay(day.date, thursday) || isAfter(day.date, thursday)
+      )
       .map(({ date, workEntries }) =>
         workEntries.map(entry => this.transformEntry(entry, date))
       )
