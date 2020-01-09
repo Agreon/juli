@@ -12,6 +12,7 @@
     "start": "ts-node src/index.ts",
     "build": "yarn clean; tsc; cp src/command.js dist/command.js",
     "clean": "rimraf ./dist; rimraf ./tsconfig.tsbuildinfo",
+    "debug": "node -r ts-node/register --inspect src/index.ts",
     "test": "tslint --project .",
     "release": "yarn test; yarn build; npm publish"
   },
