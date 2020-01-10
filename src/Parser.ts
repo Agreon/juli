@@ -1,5 +1,6 @@
 import { IWorkDay, IWorkEntry } from "./types";
 import { parseDate } from "./jira/util";
+import { FormatError } from "./errors";
 
 export class Parser {
   public static parse(text: string): IWorkDay[] {
@@ -13,8 +14,7 @@ export class Parser {
       const date = parseDate(first, ["d.M.", "d.M.yy"]);
 
       if (!date) {
-        console.error(`Could not parse date ${first}`);
-        process.exit(1);
+        throw new FormatError(`Could not parse date ${first}`);
       }
 
       return {
@@ -48,12 +48,12 @@ export class Parser {
           ticketId = parts[0].replace("+", "").trim();
           const existingEntry = entries.find(e => e.ticketId === ticketId);
           if (!existingEntry) {
-            console.error(
+            throw new FormatError(
               `Missing Description for ${ticketId} on day ${startTime}`
             );
-            process.exit(1);
+          } else {
+            description = existingEntry.description;
           }
-          description = existingEntry.description;
         } else {
           ticketId = parts[0].replace("+", "").trim();
           description = parts
@@ -95,8 +95,7 @@ export class Parser {
     const time = parseDate(trimmed, ["H", "H:m"]);
 
     if (!time) {
-      console.error(`Time ${trimmed} not in right format`);
-      process.exit(1);
+      throw new FormatError(`Time ${trimmed} not in right format`);
     }
 
     return time;

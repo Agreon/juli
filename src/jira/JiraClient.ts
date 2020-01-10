@@ -39,30 +39,15 @@ export class JiraClient {
   constructor(private host: string, private credentials: IJiraCredentials) {}
 
   public async obtainCookie() {
-    try {
-      const retVal = await axios.post(SESSION_URL(this.host), this.credentials);
-
-      if (retVal.status !== 200) {
-        throw new Error("Login failed");
-      }
-      this.cookie = `JSESSIONID=${retVal.data.session.value}`;
-    } catch (e) {
-      if (e.response.data?.errorMessages?.length) {
-        console.log("Login failed:");
-        e.response.data.errorMessages.map((m: string) => console.error(m));
-        process.exit(1);
-      }
-
-      if (e.response.headers["x-seraph-loginreason"]) {
-        console.error(
-          "CAPTCHA Error. Please complete the Captcha in your Browser"
-        );
-        process.exit(1);
-      }
-
-      console.error("Login failed");
-      process.exit(1);
-    }
+    const axiosInstance = axios.create({
+      validateStatus: status => status === 200,
+      timeout: 10000
+    });
+    const retVal = await axiosInstance.post(
+      SESSION_URL(this.host),
+      this.credentials
+    );
+    this.cookie = `JSESSIONID=${retVal.data.session.value}`;
   }
 
   public async createWorklog(
