@@ -48,7 +48,7 @@ export class Parser {
 
       if (!description || !ticketId) {
         const parts = lines[i].split(":");
-        // Add existing description if just adding something to a worklog
+        // Add existing comment if just adding something to a worklog
         if (parts.length === 1) {
           ticketId = parts[0].replace("+", "").trim();
           const existingEntry = entries.find(e => e.ticketId === ticketId);

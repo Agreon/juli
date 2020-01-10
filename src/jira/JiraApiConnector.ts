@@ -1,28 +1,28 @@
 import * as readlineSync from "readline-sync";
 import {
   differenceInSeconds,
-  setMinutes,
-  setHours,
   isAfter,
-  isSameDay
+  isSameDay,
+  setHours,
+  setMinutes
 } from "date-fns";
 import { IApiConnector, IWorkDay, IWorkEntry } from "../types";
 import { JiraStore } from "./JiraStore";
 import {
-  JiraClient,
-  IJiraLogInput,
   IJiraCredentials,
+  IJiraLogInput,
   IJiraWorklog,
-  IJiraAlias
+  JiraClient
 } from "./JiraClient";
 import { getLastThursday, executeTasks } from "./util";
 import { Logger } from "../util/Logger";
-import { InvalidArgumentError } from "../errors/InvalidArgumentError";
+import { AliasStore } from "../repository/AliasStore";
 
 export class JiraApiConnector implements IApiConnector {
   private client: JiraClient;
   private store: JiraStore = new JiraStore();
   private credentials: IJiraCredentials;
+  private aliasRepository = new AliasStore();
 
   constructor(saveCredentials: boolean = false) {
     let host = this.store.getHost();
@@ -45,32 +45,6 @@ export class JiraApiConnector implements IApiConnector {
     const host = readlineSync.question("Jira-Host: ");
     new JiraStore().setHost(host);
     return host;
-  }
-
-  // tslint:disable-next-line: member-ordering
-  public static async updateAlias(alias: string): Promise<IJiraAlias> {
-    const [rawName = "", rawIssueId = ""] = alias.split("=");
-    const name = rawName.trim();
-    const issueId = rawIssueId.trim();
-
-    if (!name) {
-      throw new InvalidArgumentError(
-        `${alias} does not match <name>=<issueId>`
-      );
-    }
-
-    const store = new JiraStore();
-    const aliases: IJiraAlias = (await store.getIssueAliases()) || {};
-
-    if (!issueId) {
-      const { [name]: _, ...remainingAliases } = aliases;
-      await store.setIssueAliases(remainingAliases);
-      return remainingAliases;
-    }
-
-    const updatedAliases = { ...aliases, [name]: issueId };
-    await store.setIssueAliases(updatedAliases);
-    return updatedAliases;
   }
 
   // tslint:disable-next-line: member-ordering
@@ -99,19 +73,14 @@ export class JiraApiConnector implements IApiConnector {
     Logger.withStep("Obtaining Cookie...", 1, 3);
     await this.client.obtainCookie();
 
-    const issueAliases = this.store.getIssueAliases();
-    const preparedEntries = this.prepareEntries(days, issueAliases);
-    console.log(JSON.stringify(preparedEntries, null, 2));
+    const preparedEntries = this.prepareEntries(days);
     const oldEntries = this.store.getExistingEntries();
 
     await this.createWorklogs(preparedEntries);
     await this.clearOldEntries(oldEntries, preparedEntries);
   }
 
-  private prepareEntries(
-    days: IWorkDay[],
-    issueAliases?: IJiraAlias | null
-  ): IJiraLogInput[] {
+  private prepareEntries(days: IWorkDay[]): IJiraLogInput[] {
     const thursday = getLastThursday();
 
     return days
@@ -119,35 +88,26 @@ export class JiraApiConnector implements IApiConnector {
         day => isSameDay(day.date, thursday) || isAfter(day.date, thursday)
       )
       .map(({ date, workEntries }) =>
-        workEntries.map(entry => this.transformEntry(entry, date, issueAliases))
+        workEntries.map(entry => this.transformEntry(entry, date))
       )
       .reduce((arr, curr) => curr.concat(arr), []);
   }
 
-  private resolveAlias = (
-    idOrName: string,
-    aliases: IJiraAlias | null = null
-  ) => {
-    const alias = aliases?.[idOrName];
-    return alias || idOrName;
-  };
-
-  private transformEntry = (
-    entry: IWorkEntry,
-    date: Date,
-    issueAliases?: IJiraAlias | null
-  ): IJiraLogInput => {
+  private transformEntry = (entry: IWorkEntry, date: Date): IJiraLogInput => {
     const dateWithHours = setHours(date, entry.startTime.getHours());
     const dateWithMinutes = setMinutes(
       dateWithHours,
       entry.startTime.getMinutes()
     );
 
+    const {
+      key,
+      comment = entry.description
+    } = this.aliasRepository.resolveAlias(entry.ticketId);
+
     return {
-      comment: entry.description,
-      issue: {
-        key: this.resolveAlias(entry.ticketId, issueAliases)
-      },
+      comment,
+      issue: { key },
       author: {
         name: this.credentials.username
       },

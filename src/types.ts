@@ -10,6 +10,15 @@ export interface IWorkEntry {
   description: string;
 }
 
+export interface IAlias {
+  key: string;
+  comment?: string;
+}
+
+export interface IAliases {
+  [name: string]: IAlias;
+}
+
 export interface IApiConnector {
   importLogs(days: IWorkDay[]): Promise<void>;
 }

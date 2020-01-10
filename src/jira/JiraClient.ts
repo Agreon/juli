@@ -23,10 +23,6 @@ export interface IJiraWorklog {
   date: Date;
 }
 
-export interface IJiraAlias {
-  [name: string]: IJiraWorklog["issueId"];
-}
-
 export interface IJiraLogInput {
   comment: string;
   dateStarted: Date;

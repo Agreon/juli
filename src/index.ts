@@ -8,6 +8,8 @@ import { Logger } from "./util/Logger";
 import { handleError } from "./util/handleError";
 import { JiraStore } from "./jira/JiraStore";
 import { InvalidArgumentError } from "./errors/InvalidArgumentError";
+import { AliasStore } from "./repository/AliasStore";
+import { IAliases } from "./types";
 
 export const execute = async () => {
   let executed = false;
@@ -36,21 +38,21 @@ export const execute = async () => {
     .action(async (alias: string) => {
       executed = true;
 
-      const printAliases = (record: Record<string, string> | null) =>
-        record
-          ? Object.entries(record).forEach(([key, value]) =>
-              console.log(`${key}=${value}`)
+      const printAliases = (aliases: IAliases | null) =>
+        aliases
+          ? Object.entries(aliases).forEach(([name, { key, comment }]) =>
+              console.log(`${name}=${key}${comment ? `,${comment}` : ""}`)
             )
           : console.log("No aliases found");
 
+      const repository = new AliasStore();
       if (!alias) {
-        const store = new JiraStore();
-        printAliases(await store.getIssueAliases());
+        printAliases(await repository.getIssueAliases());
         return;
       }
 
       try {
-        const aliases = await JiraApiConnector.updateAlias(alias);
+        const aliases = await repository.updateAlias(alias);
         printAliases(aliases);
       } catch (e) {
         console.error(e.message);
