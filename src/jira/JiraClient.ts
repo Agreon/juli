@@ -65,8 +65,8 @@ export class JiraClient {
         date: res.data.dateStarted
       };
     } catch (e) {
-      if (e.response.status === 404) {
-        console.log(`No Ticket for ${item.issue.key} found`);
+      if (e.response.status === 400) {
+        console.log(`No Ticket for '${item.issue.key}' found`);
       } else {
         console.error("An unexpected Error occurred: \n");
         console.log(e.response.data);
