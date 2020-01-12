@@ -18,6 +18,8 @@ jobs:
       run: yarn && yarn run build
     - name: Publish if version has been updated
       uses: pascalgn/npm-publish-action@51fdb4531e99aac1873764ef7271af448dc42ab4
+      with:
+        commit_pattern: "^Release (\\S+)"
       env: # More info about the environment variables in the README
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this as is, it's automatically generated
         NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }} 
