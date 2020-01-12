@@ -15,7 +15,7 @@ jobs:
       with:
         node-version: 10.0.0
     - name: Build
-      run: yarn run build
+      run: yarn && yarn run build
     - name: Publish if version has been updated
       uses: pascalgn/npm-publish-action@51fdb4531e99aac1873764ef7271af448dc42ab4
       env: # More info about the environment variables in the README
