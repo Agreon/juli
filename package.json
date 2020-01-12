@@ -4,7 +4,7 @@
   "repository": {
     "url": "https://github.com/Agreon/juli"
   },
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "dist/command.js",
   "author": "Daniel Huth",
   "license": "MIT",

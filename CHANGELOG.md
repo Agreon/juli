@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.9]
+
+- Fixed a bug in step display.
+
 ## [0.0.8]
 
 - Improved UX with chalk.
