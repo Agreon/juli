@@ -1,4 +1,6 @@
 import axios from "axios";
+import { AuthenticationError } from "../errors";
+import { handleError } from "../util/handleError";
 
 const SESSION_URL = (host: string) => `${host}/rest/auth/1/session`;
 const WORKLOG_URL = (host: string) =>
@@ -43,11 +45,16 @@ export class JiraClient {
       validateStatus: status => status === 200,
       timeout: 10000
     });
-    const retVal = await axiosInstance.post(
-      SESSION_URL(this.host),
-      this.credentials
-    );
-    this.cookie = `JSESSIONID=${retVal.data.session.value}`;
+
+    try {
+      const retVal = await axiosInstance.post(
+        SESSION_URL(this.host),
+        this.credentials
+      );
+      this.cookie = `JSESSIONID=${retVal.data.session.value}`;
+    } catch (e) {
+      throw AuthenticationError.fromAxiosError(e);
+    }
   }
 
   public async createWorklog(
@@ -65,12 +72,13 @@ export class JiraClient {
         date: res.data.dateStarted
       };
     } catch (e) {
-      if (e.response.status === 400) {
-        console.log(`No Ticket for '${item.issue.key}' found`);
-      } else {
-        console.error("An unexpected Error occurred: \n");
-        console.log(e.response.data);
-      }
+      handleError(
+        e,
+        e.response.status === 400
+          ? `No Ticket for '${item.issue.key}' found`
+          : undefined,
+        "warning"
+      );
     }
     return null;
   }
@@ -82,10 +90,11 @@ export class JiraClient {
         this.getRequestOptions()
       );
     } catch (e) {
-      console.error(
-        `Could not delete worklog ${log.id} for issue ${log.issueId}: \n`
+      handleError(
+        e,
+        `Could not delete worklog ${log.id} for issue ${log.issueId}`,
+        "warning"
       );
-      console.log(e.response.data);
     }
   }
 

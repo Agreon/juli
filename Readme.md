@@ -72,7 +72,8 @@ Entries, that were added manually or through other tools are not affected by thi
 - Let the user specify a custom entry range
 - Add a default host for jira
 - Use a better Framework for CLI-Parsing
-- Improve error handling with Chalk
 - Add Opmet integration.
+- Add Verbose-Flag
+- Add the possibility to add comments to the timesheet
 
 **If you want to help, visit the [Repo](https://github.com/Agreon/juli)**

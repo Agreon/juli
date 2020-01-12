@@ -3,12 +3,14 @@ import { readFileSync } from "fs";
 import { Parser } from "./Parser";
 import { JiraApiConnector } from "./jira/JiraApiConnector";
 import { FormatError } from "./errors";
-import { UpdateChecker } from "./UpdateChecker";
+import { checkForUpdates } from "./util/checkForUpdates";
+import { Logger } from "./util/Logger";
+import { handleError } from "./util/handleError";
 
 export const execute = async () => {
   let executed = false;
 
-  await UpdateChecker.checkForUpdates();
+  await checkForUpdates();
 
   commander
     .command("updateCredentials")
@@ -42,9 +44,9 @@ export const execute = async () => {
         const dates = Parser.parse(fileContent);
 
         await connector.importLogs(dates);
-        console.log("Import was successful");
+        Logger.success("Import was successful");
       } catch (e) {
-        console.error(e.message);
+        handleError(e);
         if (e instanceof FormatError) {
           process.exit(128);
         }
@@ -55,9 +57,12 @@ export const execute = async () => {
   commander.parse(process.argv);
 
   if (!executed) {
-    console.error("Please specify a timesheet file");
+    Logger.error("Please specify a timesheet file");
     process.exit(1);
   }
 };
 
-execute().catch(console.error);
+execute().catch(e => {
+  handleError(e);
+  process.exit(1);
+});

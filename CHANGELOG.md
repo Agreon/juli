@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.8]
+
+- Improved UX with chalk.
+
 ## [0.0.7]
 
 - Added Progress Bars.

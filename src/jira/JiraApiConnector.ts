@@ -1,10 +1,5 @@
 import * as readlineSync from "readline-sync";
 import {
-  SingleBar,
-  Presets,
-  Options as ProgressBarOptions
-} from "cli-progress";
-import {
   differenceInSeconds,
   setMinutes,
   setHours,
@@ -19,13 +14,8 @@ import {
   IJiraCredentials,
   IJiraWorklog
 } from "./JiraClient";
-import { getLastThursday } from "./util";
-import { AuthenticationError } from "../errors";
-
-const PROGRESS_BAR_OPTIONS: ProgressBarOptions = {
-  format: "[{bar}] {percentage}% || {value}/{total}",
-  hideCursor: true
-};
+import { getLastThursday, executeTasks } from "./util";
+import { Logger } from "../util/Logger";
 
 export class JiraApiConnector implements IApiConnector {
   private client: JiraClient;
@@ -70,7 +60,7 @@ export class JiraApiConnector implements IApiConnector {
     };
 
     if (saveCredentials) {
-      console.log("Saving credentials");
+      Logger.info("Saving credentials");
       new JiraStore().setCredentials(credentials);
     }
 
@@ -78,19 +68,14 @@ export class JiraApiConnector implements IApiConnector {
   }
 
   public async importLogs(days: IWorkDay[]) {
-    console.log("Obtaining Cookie...");
-    try {
-      await this.client.obtainCookie();
-    } catch (e) {
-      throw AuthenticationError.fromAxiosError(e);
-    }
+    Logger.withStep("Obtaining Cookie...", 1, 3);
+    await this.client.obtainCookie();
 
     const preparedEntries = this.prepareEntries(days);
-
-    const oldLogs = this.store.getExistingEntries();
+    const oldEntries = this.store.getExistingEntries();
 
     await this.createWorklogs(preparedEntries);
-    await this.clearOldLogs(oldLogs, preparedEntries);
+    await this.clearOldEntries(oldEntries, preparedEntries);
   }
 
   private prepareEntries(days: IWorkDay[]): IJiraLogInput[] {
@@ -104,40 +89,6 @@ export class JiraApiConnector implements IApiConnector {
         workEntries.map(entry => this.transformEntry(entry, date))
       )
       .reduce((arr, curr) => curr.concat(arr), []);
-  }
-
-  /**
-   * Clears logs that were previously written and are part of the current batch
-   * @param logs
-   * @param onDays
-   */
-  private async clearOldLogs(
-    logs: IJiraWorklog[] | null,
-    onDays: IJiraLogInput[]
-  ) {
-    const relevantLogs = logs?.filter(entry =>
-      onDays.some(day => isSameDay(entry.date, day.dateStarted))
-    );
-
-    if (!relevantLogs || !relevantLogs.length) {
-      console.log("No Logs to erase found");
-      return;
-    }
-
-    console.log("Clearing old logs...");
-
-    const progressBar = new SingleBar(PROGRESS_BAR_OPTIONS, Presets.legacy);
-
-    progressBar.start(relevantLogs.length, 0);
-
-    await Promise.all(
-      relevantLogs.map(async log => {
-        await this.client.deleteWorklog(log);
-        progressBar.increment(1);
-      })
-    );
-
-    progressBar.stop();
   }
 
   private transformEntry = (entry: IWorkEntry, date: Date): IJiraLogInput => {
@@ -161,25 +112,40 @@ export class JiraApiConnector implements IApiConnector {
   };
 
   private async createWorklogs(inputs: IJiraLogInput[]) {
-    console.log("Creating Worklogs...");
+    Logger.withStep("Creating Worklogs...", 2, 3);
 
-    const progressBar = new SingleBar(PROGRESS_BAR_OPTIONS, Presets.legacy);
-
-    progressBar.start(inputs.length, 0);
-
-    const createdLogs = await Promise.all(
-      inputs.map(async log => {
-        const logWithId = await this.client.createWorklog(log);
-        progressBar.increment(1);
-        return logWithId;
-      })
+    const createdLogs = await executeTasks(
+      inputs.map(log => () => this.client.createWorklog(log))
     );
-
-    progressBar.stop();
 
     // Filter those that were not successful
     const logsWithIds = createdLogs.filter(log => !!log) as IJiraWorklog[];
 
     this.store.setExistingEntries(logsWithIds);
+  }
+
+  /**
+   * Clears logs that were previously written and are part of the current batch
+   * @param logs
+   * @param onDays
+   */
+  private async clearOldEntries(
+    logs: IJiraWorklog[] | null,
+    onDays: IJiraLogInput[]
+  ) {
+    const relevantLogs = logs?.filter(entry =>
+      onDays.some(day => isSameDay(entry.date, day.dateStarted))
+    );
+
+    Logger.withStep(" Clearing old logs...", 1, 3);
+
+    if (!relevantLogs || !relevantLogs.length) {
+      Logger.info("No Logs to erase found");
+      return;
+    }
+
+    await executeTasks(
+      relevantLogs.map(log => () => this.client.deleteWorklog(log))
+    );
   }
 }
