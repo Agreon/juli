@@ -30,7 +30,10 @@ export class Parser {
     const lines = text
       .split("\n")
       .slice(1)
-      .map(t => t.trim());
+      .map(l => l.trim())
+      // Filter comments and empty lines
+      .filter(l => l.length > 1 && l[0] !== "/" && l[1] !== "/")
+      .filter(l => !!l);
 
     let startTime: Date | null = null;
     let endTime: Date | null = null;
@@ -42,6 +45,7 @@ export class Parser {
         startTime = this.parseTime(lines[i]);
         continue;
       }
+
       if (!description || !ticketId) {
         const parts = lines[i].split(":");
         // Add existing description if just adding something to a worklog

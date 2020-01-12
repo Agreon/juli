@@ -3,6 +3,7 @@
 ## [0.0.8]
 
 - Improved UX with chalk.
+- Added the possibility to add comments.
 
 ## [0.0.7]
 

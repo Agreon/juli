@@ -28,7 +28,7 @@ $ juli <timesheet-file> [Params]
 <END_TIME / START_TIME_OF_NEXT>
     <ISSUE-KEY>: <DESCRIPTION>
 <END_TIME>
-    /** An empty body represents a break **/
+    // An empty body represents a break
 <START_TIME>
     <ISSUE-KEY>: <DESCRIPTION>
 <END_TIME>
@@ -40,6 +40,7 @@ $ juli <timesheet-file> [Params]
 - Format of the date: `d.M.[YY]`
 - Format of the the time: `h[:m]`
 - `: <DESCRIPTION>` can be omitted, if there is an existing issue-definition on the same day already.
+- `//` At the beginning of a line represent comments which will be ignored
 
 **Example**
 
@@ -74,6 +75,5 @@ Entries, that were added manually or through other tools are not affected by thi
 - Use a better Framework for CLI-Parsing
 - Add Opmet integration.
 - Add Verbose-Flag
-- Add the possibility to add comments to the timesheet
 
 **If you want to help, visit the [Repo](https://github.com/Agreon/juli)**
