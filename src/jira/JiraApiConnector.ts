@@ -137,7 +137,7 @@ export class JiraApiConnector implements IApiConnector {
       onDays.some(day => isSameDay(entry.date, day.dateStarted))
     );
 
-    Logger.withStep(" Clearing old logs...", 1, 3);
+    Logger.withStep("Clearing old logs...", 3, 3);
 
     if (!relevantLogs || !relevantLogs.length) {
       Logger.info("No Logs to erase found");
