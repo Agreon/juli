@@ -1,5 +1,9 @@
 import * as readlineSync from "readline-sync";
-import { IApiConnector, IWorkDay, IWorkEntry } from "../types";
+import {
+  SingleBar,
+  Presets,
+  Options as ProgressBarOptions
+} from "cli-progress";
 import {
   differenceInSeconds,
   setMinutes,
@@ -7,6 +11,7 @@ import {
   isAfter,
   isSameDay
 } from "date-fns";
+import { IApiConnector, IWorkDay, IWorkEntry } from "../types";
 import { JiraStore } from "./JiraStore";
 import {
   JiraClient,
@@ -16,6 +21,11 @@ import {
 } from "./JiraClient";
 import { getLastThursday } from "./util";
 import { AuthenticationError } from "../errors";
+
+const PROGRESS_BAR_OPTIONS: ProgressBarOptions = {
+  format: "[{bar}] {percentage}% || {value}/{total}",
+  hideCursor: true
+};
 
 export class JiraApiConnector implements IApiConnector {
   private client: JiraClient;
@@ -115,7 +125,19 @@ export class JiraApiConnector implements IApiConnector {
     }
 
     console.log("Clearing old logs...");
-    await Promise.all(relevantLogs.map(log => this.client.deleteWorklog(log)));
+
+    const progressBar = new SingleBar(PROGRESS_BAR_OPTIONS, Presets.legacy);
+
+    progressBar.start(relevantLogs.length, 0);
+
+    await Promise.all(
+      relevantLogs.map(async log => {
+        await this.client.deleteWorklog(log);
+        progressBar.increment(1);
+      })
+    );
+
+    progressBar.stop();
   }
 
   private transformEntry = (entry: IWorkEntry, date: Date): IJiraLogInput => {
@@ -141,9 +163,19 @@ export class JiraApiConnector implements IApiConnector {
   private async createWorklogs(inputs: IJiraLogInput[]) {
     console.log("Creating Worklogs...");
 
+    const progressBar = new SingleBar(PROGRESS_BAR_OPTIONS, Presets.legacy);
+
+    progressBar.start(inputs.length, 0);
+
     const createdLogs = await Promise.all(
-      inputs.map(log => this.client.createWorklog(log))
+      inputs.map(async log => {
+        const logWithId = await this.client.createWorklog(log);
+        progressBar.increment(1);
+        return logWithId;
+      })
     );
+
+    progressBar.stop();
 
     // Filter those that were not successful
     const logsWithIds = createdLogs.filter(log => !!log) as IJiraWorklog[];

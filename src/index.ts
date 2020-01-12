@@ -3,9 +3,12 @@ import { readFileSync } from "fs";
 import { Parser } from "./Parser";
 import { JiraApiConnector } from "./jira/JiraApiConnector";
 import { FormatError } from "./errors";
+import { UpdateChecker } from "./UpdateChecker";
 
-export const execute = () => {
+export const execute = async () => {
   let executed = false;
+
+  await UpdateChecker.checkForUpdates();
 
   commander
     .command("updateCredentials")
@@ -47,8 +50,9 @@ export const execute = () => {
         }
         process.exit(1);
       }
-    })
-    .parse(process.argv);
+    });
+
+  commander.parse(process.argv);
 
   if (!executed) {
     console.error("Please specify a timesheet file");
@@ -56,4 +60,4 @@ export const execute = () => {
   }
 };
 
-execute();
+execute().catch(console.error);
