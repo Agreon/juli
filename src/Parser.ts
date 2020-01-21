@@ -86,7 +86,10 @@ export class Parser {
 
         if (!description) {
           throw new FormatError(
-            `Missing Description for ${ticketId} on day ${startTime}`
+            `Missing Description for Issue '${ticketId}' on ${format(
+              startTime,
+              "d.M."
+            )}`
           );
         }
 

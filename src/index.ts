@@ -6,7 +6,6 @@ import { FormatError } from "./errors";
 import { checkForUpdates } from "./util/checkForUpdates";
 import { Logger } from "./util/Logger";
 import { handleError } from "./util/handleError";
-import { JiraStore } from "./jira/JiraStore";
 import { InvalidArgumentError } from "./errors/InvalidArgumentError";
 import { AliasStore } from "./repository/AliasStore";
 import { IAliases } from "./types";
