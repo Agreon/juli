@@ -42,11 +42,11 @@ export const execute = async () => {
           ? Object.entries(
               aliases
             ).forEach(([name, { ticketId, description }]) =>
-              console.log(
+              Logger.info(
                 `${name}=${ticketId}${description ? `,${description}` : ""}`
               )
             )
-          : console.log("No aliases found");
+          : Logger.warn("No aliases found");
 
       const repository = new AliasStore();
       if (!alias) {
@@ -58,7 +58,7 @@ export const execute = async () => {
         const aliases = await repository.updateAlias(alias);
         printAliases(aliases);
       } catch (e) {
-        console.error(e.message);
+        Logger.error(e.message);
         if (e instanceof InvalidArgumentError) {
           process.exit(129);
         }
