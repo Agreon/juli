@@ -11,8 +11,8 @@ export interface IWorkEntry {
 }
 
 export interface IAlias {
-  key: string;
-  comment?: string;
+  ticketId: string;
+  description?: string;
 }
 
 export interface IAliases {

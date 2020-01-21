@@ -23,7 +23,7 @@ export class AliasStore {
   }
 
   public async updateAlias(alias: string): Promise<IAliases> {
-    const aliasRegex = /^(?<name>.*)\s*=(?:\s*(?<key>[\w-]+)(?:\s*,\s*(?<comment>.*))?)?/;
+    const aliasRegex = /^(?<name>.*)\s*=(?:\s*(?<ticketId>[\w-]+)(?:\s*,\s*(?<description>.*))?)?/;
 
     const matchObj = aliasRegex.exec(alias);
     if (!matchObj?.groups) {
@@ -32,7 +32,7 @@ export class AliasStore {
       );
     }
 
-    const { name, key, comment } = matchObj.groups;
+    const { name, ticketId, description } = matchObj.groups;
     if (!name) {
       throw new InvalidArgumentError(
         `${alias} does not match <name>=<issueId>`
@@ -41,19 +41,19 @@ export class AliasStore {
 
     const aliases: IAliases = (await this.getIssueAliases()) || {};
 
-    if (!key) {
+    if (!ticketId) {
       const { [name]: _, ...remainingAliases } = aliases;
       await this.setIssueAliases(remainingAliases);
       return remainingAliases;
     }
 
-    const updatedAliases = { ...aliases, [name]: { key, comment } };
+    const updatedAliases = { ...aliases, [name]: { ticketId, description } };
     await this.setIssueAliases(updatedAliases);
     return updatedAliases;
   }
 
   public resolveAlias: (idOrName: string) => IAlias = (idOrName: string) => {
     const alias = this.aliases?.[idOrName];
-    return alias || { key: idOrName };
+    return alias || { ticketId: idOrName };
   };
 }

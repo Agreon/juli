@@ -40,8 +40,12 @@ export const execute = async () => {
 
       const printAliases = (aliases: IAliases | null) =>
         aliases
-          ? Object.entries(aliases).forEach(([name, { key, comment }]) =>
-              console.log(`${name}=${key}${comment ? `,${comment}` : ""}`)
+          ? Object.entries(
+              aliases
+            ).forEach(([name, { ticketId, description }]) =>
+              console.log(
+                `${name}=${ticketId}${description ? `,${description}` : ""}`
+              )
             )
           : console.log("No aliases found");
 
@@ -74,9 +78,10 @@ export const execute = async () => {
     .action(async (file: string, obj: any) => {
       executed = true;
       const connector = new JiraApiConnector(obj.saveCredentials);
+      const parser = new Parser();
       try {
         const fileContent = readFileSync(file, "utf8");
-        const dates = Parser.parse(fileContent);
+        const dates = parser.parse(fileContent);
 
         await connector.importLogs(dates);
         Logger.success("Import was successful");

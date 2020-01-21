@@ -16,13 +16,11 @@ import {
 } from "./JiraClient";
 import { getLastThursday, executeTasks } from "./util";
 import { Logger } from "../util/Logger";
-import { AliasStore } from "../repository/AliasStore";
 
 export class JiraApiConnector implements IApiConnector {
   private client: JiraClient;
   private store: JiraStore = new JiraStore();
   private credentials: IJiraCredentials;
-  private aliasRepository = new AliasStore();
 
   constructor(saveCredentials: boolean = false) {
     let host = this.store.getHost();
@@ -100,14 +98,9 @@ export class JiraApiConnector implements IApiConnector {
       entry.startTime.getMinutes()
     );
 
-    const {
-      key,
-      comment = entry.description
-    } = this.aliasRepository.resolveAlias(entry.ticketId);
-
     return {
-      comment,
-      issue: { key },
+      comment: entry.description,
+      issue: { key: entry.ticketId },
       author: {
         name: this.credentials.username
       },
