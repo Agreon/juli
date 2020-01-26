@@ -4,17 +4,17 @@ import * as path from "path";
 import { InvalidArgumentError } from "../errors/InvalidArgumentError";
 import { IAlias, IAliases } from "../types";
 
-export class AliasStore {
-  static readonly ALIAS_FILE = path.join("jira", "alias.json");
+export const ALIAS_FILE = path.join("alias.json");
 
+export class AliasStore {
   private aliases: IAliases =
-    fs.readJsonSync(CREATE_PATH(AliasStore.ALIAS_FILE), {
+    fs.readJsonSync(CREATE_PATH(ALIAS_FILE), {
       encoding: "UTF-8",
       throws: false
     }) || {};
 
   public setIssueAliases(entries: IAliases) {
-    fs.outputJsonSync(CREATE_PATH(AliasStore.ALIAS_FILE), entries);
+    fs.outputJsonSync(CREATE_PATH(ALIAS_FILE), entries);
     this.aliases = entries;
   }
 
