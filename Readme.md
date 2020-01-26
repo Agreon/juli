@@ -75,8 +75,14 @@ Entries, that were added manually or through other tools are not affected by thi
 - `updateHost`: Update the saved Jira host.
 - `updateCredentials`: Update the saved credentials.
 - `alias [alias]`
-  - Upsert an alias with `<name>=[issueId],[comment]`
-  - Remove an alias with `<name>=`
+  - Upsert an alias with `juli alias <name>=[issueId],[comment]`
+    ```bash
+    juli alias "DAILY=JIRA-123,I told everyone what i did and going to do today"
+    ```
+  - Remove an alias with `juli alias <name>=`
+    ```bash
+    juli alias DAILY=
+    ```
 
 ## Todo
 
