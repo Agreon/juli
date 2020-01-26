@@ -6,6 +6,8 @@ import { IAlias, IAliases } from "../types";
 
 export const ALIAS_FILE = path.join("alias.json");
 
+export type AliasResolver = (idOrName: string) => IAlias;
+
 export class AliasStore {
   private aliases: IAliases =
     fs.readJsonSync(CREATE_PATH(ALIAS_FILE), {
@@ -52,7 +54,7 @@ export class AliasStore {
     return updatedAliases;
   }
 
-  public resolveAlias: (idOrName: string) => IAlias = (idOrName: string) => {
+  public resolveAlias: AliasResolver = (idOrName: string) => {
     const alias = this.aliases?.[idOrName];
     return alias || { ticketId: idOrName };
   };
