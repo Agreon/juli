@@ -46,7 +46,8 @@ $ juli <timesheet-file> [Params]
 - Format of the date: `d.M.[YY]`
 - Format of the the time: `h[:m]`
 - `: <DESCRIPTION>` can be omitted, if there is an existing issue-definition on the same day already.
-- `<ALIAS>` entries can be managed with the command `juli alias my-daily-alias=ISSUE-123`- `//` At the beginning of a line represent comments which will be ignored
+- `<ALIAS>` entries can be managed with the command `juli alias my-daily-alias=ISSUE-123`
+- `//` At the beginning of a line represent comments which will be ignored
 
 **Example**
 
