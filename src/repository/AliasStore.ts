@@ -39,7 +39,7 @@ export class AliasStore {
       );
     }
 
-    const aliases: IAliases = (await this.getIssueAliases()) || {};
+    const aliases: IAliases = this.getIssueAliases() || {};
 
     if (!ticketId) {
       const { [name]: _, ...remainingAliases } = aliases;
