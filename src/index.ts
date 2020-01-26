@@ -6,6 +6,9 @@ import { FormatError } from "./errors";
 import { checkForUpdates } from "./util/checkForUpdates";
 import { Logger } from "./util/Logger";
 import { handleError } from "./util/handleError";
+import { InvalidArgumentError } from "./errors/InvalidArgumentError";
+import { AliasStore } from "./repository/AliasStore";
+import { IAliases } from "./types";
 
 export const execute = async () => {
   let executed = false;
@@ -29,6 +32,41 @@ export const execute = async () => {
     });
 
   commander
+    .command("alias [pair]")
+    .description("Upsert an alias with <name>=[issueId]")
+    .action(async (alias: string) => {
+      executed = true;
+
+      const printAliases = (aliases: IAliases | null) =>
+        aliases
+          ? Object.entries(
+              aliases
+            ).forEach(([name, { ticketId, description }]) =>
+              Logger.info(
+                `${name}=${ticketId}${description ? `,${description}` : ""}`
+              )
+            )
+          : Logger.warn("No aliases found");
+
+      const repository = new AliasStore();
+      if (!alias) {
+        printAliases(await repository.getIssueAliases());
+        return;
+      }
+
+      try {
+        const aliases = await repository.updateAlias(alias);
+        printAliases(aliases);
+      } catch (e) {
+        Logger.error(e.message);
+        if (e instanceof InvalidArgumentError) {
+          process.exit(129);
+        }
+        process.exit(1);
+      }
+    });
+
+  commander
     .version("0.0.1")
     .arguments("<file>")
     .option(
@@ -39,9 +77,10 @@ export const execute = async () => {
     .action(async (file: string, obj: any) => {
       executed = true;
       const connector = new JiraApiConnector(obj.saveCredentials);
+      const parser = new Parser();
       try {
         const fileContent = readFileSync(file, "utf8");
-        const dates = Parser.parse(fileContent);
+        const dates = parser.parse(fileContent);
 
         await connector.importLogs(dates);
         Logger.success("Import was successful");
@@ -54,7 +93,7 @@ export const execute = async () => {
       }
     });
 
-  commander.parse(process.argv);
+  await commander.parseAsync(process.argv);
 
   if (!executed) {
     Logger.error("Please specify a timesheet file");

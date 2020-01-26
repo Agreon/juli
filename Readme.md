@@ -32,6 +32,12 @@ $ juli <timesheet-file> [Params]
 <START_TIME>
     <ISSUE-KEY>: <DESCRIPTION>
 <END_TIME>
+<START_TIME>
+    <ALIAS>: <DESCRIPTION>
+<END_TIME>
+<START_TIME>
+    <ALIAS_WITH_COMMENT>:
+<END_TIME>
 
 # <DATE>
 ...
@@ -40,6 +46,7 @@ $ juli <timesheet-file> [Params]
 - Format of the date: `d.M.[YY]`
 - Format of the the time: `h[:m]`
 - `: <DESCRIPTION>` can be omitted, if there is an existing issue-definition on the same day already.
+- `<ALIAS>` entries can be managed with the command `juli alias my-daily-alias=ISSUE-123`
 - `//` At the beginning of a line represent comments which will be ignored
 
 **Example**
@@ -49,6 +56,9 @@ $ juli <timesheet-file> [Params]
 8
     XYZ-60: Wrote Readme
 9:20
+9:30
+    my-daily-alias: Daily Scrum
+9:45
 10
     XYZ-60: Published Package
 11
@@ -64,6 +74,15 @@ Entries, that were added manually or through other tools are not affected by thi
 
 - `updateHost`: Update the saved Jira host.
 - `updateCredentials`: Update the saved credentials.
+- `alias [alias]`
+  - Upsert an alias with `juli alias <name>=[issueId],[comment]`
+    ```bash
+    juli alias "DAILY=JIRA-123,I told everyone what i did and going to do today"
+    ```
+  - Remove an alias with `juli alias <name>=`
+    ```bash
+    juli alias DAILY=
+    ```
 
 ## Todo
 

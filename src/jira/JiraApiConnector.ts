@@ -1,18 +1,18 @@
 import * as readlineSync from "readline-sync";
 import {
   differenceInSeconds,
-  setMinutes,
-  setHours,
   isAfter,
-  isSameDay
+  isSameDay,
+  setHours,
+  setMinutes
 } from "date-fns";
 import { IApiConnector, IWorkDay, IWorkEntry } from "../types";
 import { JiraStore } from "./JiraStore";
 import {
-  JiraClient,
-  IJiraLogInput,
   IJiraCredentials,
-  IJiraWorklog
+  IJiraLogInput,
+  IJiraWorklog,
+  JiraClient
 } from "./JiraClient";
 import { getLastThursday, executeTasks } from "./util";
 import { Logger } from "../util/Logger";
@@ -100,9 +100,7 @@ export class JiraApiConnector implements IApiConnector {
 
     return {
       comment: entry.description,
-      issue: {
-        key: entry.ticketId
-      },
+      issue: { key: entry.ticketId },
       author: {
         name: this.credentials.username
       },
