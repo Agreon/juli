@@ -16,6 +16,6 @@ export class Logger {
     console.log(`${red("Error")} ${message}`);
   }
   public static withStep(message: string, step: number, max: number) {
-    console.log(`${lightGrey(`${step}/${max}`)} ${message}`);
+    console.log(`${lightGrey(`[${step}/${max}]`)} ${message}`);
   }
 }

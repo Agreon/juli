@@ -20,12 +20,12 @@ export class Parser {
 
       return {
         date,
-        workEntries: this.parseDay(day)
+        workEntries: this.parseDay(date, day)
       };
     });
   }
 
-  private static parseDay(text: string): IWorkEntry[] {
+  private static parseDay(date: Date, text: string): IWorkEntry[] {
     const entries: IWorkEntry[] = [];
     const lines = text
       .split("\n")
@@ -51,11 +51,14 @@ export class Parser {
         // Add existing description if just adding something to a worklog
         if (parts.length === 1) {
           ticketId = parts[0].replace("+", "").trim();
-          const existingEntry = entries.find(e => e.ticketId === ticketId);
+          const existingEntry = [...entries]
+            .reverse()
+            .find(e => e.ticketId === ticketId);
+
           if (!existingEntry) {
             throw new FormatError(
               `Missing Description for Issue '${ticketId}' on ${format(
-                startTime,
+                date,
                 "d.M."
               )}`
             );
