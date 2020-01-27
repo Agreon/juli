@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.10]
+- Improved error information.
+- Added tests.
+
 ## [0.0.9]
 
 - Fixed a bug in step display.
