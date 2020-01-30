@@ -88,10 +88,7 @@ export class Parser {
       startTime = endTime;
 
       // Take breaks into account
-      if (
-        i < lines.length - 1 &&
-        lines[i + 1].replace("+", "").trim().length < 6
-      ) {
+      if (i < lines.length - 1 && Parser.lineIsTime(lines[i + 1])) {
         startTime = null;
       }
 
@@ -110,5 +107,14 @@ export class Parser {
     }
 
     return time;
+  }
+
+  private static lineIsTime(line: string): boolean {
+    try {
+      Parser.parseTime(line);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.11]
+- Fixed a bug where the ticket id was recognized as a start time of the next entry if it was too short.
+
 ## [0.0.10]
 - Improved error information.
 - Added tests.

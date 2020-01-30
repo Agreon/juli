@@ -88,6 +88,42 @@ describe("parser", () => {
     expect(getHours(workEntries[1].endTime)).toEqual(13);
   });
 
+  it("should parse multiple worklogs correctly without pause from the same type", () => {
+    const testData = `
+    # 29.01.
+    + 6:50
+      + TTT-1: Test-Description
+    + 9:30
+      + TTT-1
+    + 15
+      + TTT-1 
+    + 17:10
+`;
+
+    const parsed = Parser.parse(testData);
+
+    expect(parsed.length).toBe(1);
+    expect(getDate(parsed[0].date)).toEqual(29);
+
+    const { workEntries } = parsed[0];
+
+    expect(workEntries.length).toBe(3);
+    expect(workEntries[0].description).toEqual("Test-Description");
+    expect(workEntries[0].ticketId).toEqual("TTT-1");
+    expect(getHours(workEntries[0].startTime)).toEqual(6);
+    expect(getHours(workEntries[0].endTime)).toEqual(9);
+
+    expect(workEntries[1].description).toEqual("Test-Description");
+    expect(workEntries[1].ticketId).toEqual("TTT-1");
+    expect(getHours(workEntries[1].startTime)).toEqual(9);
+    expect(getHours(workEntries[1].endTime)).toEqual(15);
+
+    expect(workEntries[2].description).toEqual("Test-Description");
+    expect(workEntries[2].ticketId).toEqual("TTT-1");
+    expect(getHours(workEntries[2].startTime)).toEqual(15);
+    expect(getHours(workEntries[2].endTime)).toEqual(17);
+  });
+
   it("should parse multiple days correctly", () => {
     const testData = `
     # 13.1.
