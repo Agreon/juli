@@ -1,6 +1,7 @@
 import axios from "axios";
 import { AuthenticationError } from "../errors";
 import { handleError } from "../util/handleError";
+import { parseDate } from "./util";
 
 const SESSION_URL = (host: string) => `${host}/rest/auth/1/session`;
 const WORKLOG_URL = (host: string) =>
@@ -11,6 +12,9 @@ const DELETE_WORKLOG_URL = (
   worklogId: string
 ) => `
 ${host}/rest/api/2/issue/${issueId}/worklog/${worklogId}`;
+
+const APPROVAL_STATUS_URL = (host: string, username: string) => `
+${host}/rest/tempo-timesheets/4/timesheet-approval/approval-statuses?numberOfPeriods=1&userKey=${username}`;
 
 export interface IJiraCredentials {
   username: string;
@@ -95,6 +99,24 @@ export class JiraClient {
         `Could not delete worklog ${log.id} for issue ${log.issueId}`,
         "warning"
       );
+    }
+  }
+
+  public async getStartDateOfCurrentApprovalPeriod(): Promise<Date> {
+    try {
+      const { data } = await axios.get(
+        APPROVAL_STATUS_URL(this.host, this.credentials.username),
+        this.getRequestOptions()
+      );
+      const date = parseDate(data[0].period.dateFrom, ["yyyy-MM-dd"]);
+
+      if (!date) {
+        throw new Error("Date had invalid format");
+      }
+      return date;
+    } catch (e) {
+      handleError(e, "Could not get start date of approval period", "error");
+      process.exit(1);
     }
   }
 

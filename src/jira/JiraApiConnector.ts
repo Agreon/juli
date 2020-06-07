@@ -14,7 +14,7 @@ import {
   IJiraCredentials,
   IJiraWorklog,
 } from "./JiraClient";
-import { getLastThursday, executeTasks } from "./util";
+import { executeTasks } from "./util";
 import { Logger } from "../util/Logger";
 
 export class JiraApiConnector implements IApiConnector {
@@ -40,7 +40,6 @@ export class JiraApiConnector implements IApiConnector {
     this.client = new JiraClient(host, this.credentials);
   }
 
-  // tslint:disable-next-line: member-ordering
   public static updateHost(): string {
     console.log("Please enter the host of your Jira instance \n");
     const host = readlineSync.question("Jira-Host: ");
@@ -48,7 +47,6 @@ export class JiraApiConnector implements IApiConnector {
     return host;
   }
 
-  // tslint:disable-next-line: member-ordering
   public static updateCredentials(saveCredentials: boolean): IJiraCredentials {
     console.log("Please enter you Jira credentials");
     console.log("");
@@ -71,25 +69,28 @@ export class JiraApiConnector implements IApiConnector {
   }
 
   public async importLogs(days: IWorkDay[]) {
-    Logger.withStep("Obtaining Cookie...", 1, 3);
+    Logger.withStep("Obtaining Cookie...", 1, 4);
     await this.client.obtainCookie();
 
-    const preparedEntries = this.prepareEntries(days);
+    const preparedEntries = await this.prepareEntries(days);
     const oldEntries = this.store.getExistingEntries();
 
     await this.createWorklogs(preparedEntries);
     await this.clearOldEntries(oldEntries, preparedEntries);
   }
 
-  private prepareEntries(days: IWorkDay[]): IJiraLogInput[] {
-    const thursday = getLastThursday();
+  private async prepareEntries(days: IWorkDay[]): Promise<IJiraLogInput[]> {
+    Logger.withStep("Fetching relevant date range...", 2, 4);
+    const startDate = this.syncAll
+      ? null
+      : await this.client.getStartDateOfCurrentApprovalPeriod();
 
     return days
       .filter(
         day =>
           this.syncAll ||
-          isSameDay(day.date, thursday) ||
-          isAfter(day.date, thursday)
+          isSameDay(day.date, startDate!) ||
+          isAfter(day.date, startDate!)
       )
       .map(({ date, workEntries }) =>
         workEntries.map(entry => this.transformEntry(entry, date))
@@ -118,7 +119,7 @@ export class JiraApiConnector implements IApiConnector {
   };
 
   private async createWorklogs(inputs: IJiraLogInput[]) {
-    Logger.withStep("Creating Worklogs...", 2, 3);
+    Logger.withStep("Creating Worklogs...", 3, 4);
 
     const createdLogs = await executeTasks(
       inputs.map(log => () => this.client.createWorklog(log))
@@ -143,7 +144,7 @@ export class JiraApiConnector implements IApiConnector {
       onDays.some(day => isSameDay(entry.date, day.dateStarted))
     );
 
-    Logger.withStep("Clearing old logs...", 3, 3);
+    Logger.withStep("Clearing old logs...", 4, 4);
 
     if (!relevantLogs || !relevantLogs.length) {
       Logger.info("No Logs to erase found");

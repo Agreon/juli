@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.13]
+- Relevant date range is now fetched from jira.
+
 ## [0.0.12]
 - Add option to ignore the sync boundary of one week by flag `-a`. Useful if you forgot to sync in time ;)
 

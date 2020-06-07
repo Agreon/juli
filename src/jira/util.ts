@@ -1,16 +1,5 @@
-import { getISODay, subDays, parse, isValid } from "date-fns";
+import { parse, isValid } from "date-fns";
 import { SingleBar, Presets } from "cli-progress";
-
-export const getLastThursday = () => {
-  const now = new Date();
-  const today = getISODay(now);
-
-  if (today > 3) {
-    return subDays(now, today - 4);
-  }
-
-  return subDays(now, 7 - (4 - today));
-};
 
 export const parseDate = (text: string, formats: string[]) => {
   const fallBack = new Date();

@@ -29,7 +29,7 @@ export const execute = async () => {
     });
 
   commander
-    .version("0.0.1")
+    .version("0.0.13")
     .arguments("<file>")
     .option(
       "-s, --saveCredentials",
