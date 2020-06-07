@@ -4,7 +4,7 @@ import {
   setMinutes,
   setHours,
   isAfter,
-  isSameDay
+  isSameDay,
 } from "date-fns";
 import { IApiConnector, IWorkDay, IWorkEntry } from "../types";
 import { JiraStore } from "./JiraStore";
@@ -12,7 +12,7 @@ import {
   JiraClient,
   IJiraLogInput,
   IJiraCredentials,
-  IJiraWorklog
+  IJiraWorklog,
 } from "./JiraClient";
 import { getLastThursday, executeTasks } from "./util";
 import { Logger } from "../util/Logger";
@@ -22,7 +22,10 @@ export class JiraApiConnector implements IApiConnector {
   private store: JiraStore = new JiraStore();
   private credentials: IJiraCredentials;
 
-  constructor(saveCredentials: boolean = false) {
+  constructor(
+    saveCredentials: boolean = false,
+    private syncAll: boolean = false
+  ) {
     let host = this.store.getHost();
     if (!host) {
       host = JiraApiConnector.updateHost();
@@ -51,12 +54,12 @@ export class JiraApiConnector implements IApiConnector {
     console.log("");
     const username = readlineSync.question("Username: ");
     const password = readlineSync.question("Password: ", {
-      hideEchoBack: true
+      hideEchoBack: true,
     });
 
     const credentials = {
       username,
-      password
+      password,
     };
 
     if (saveCredentials) {
@@ -83,7 +86,10 @@ export class JiraApiConnector implements IApiConnector {
 
     return days
       .filter(
-        day => isSameDay(day.date, thursday) || isAfter(day.date, thursday)
+        day =>
+          this.syncAll ||
+          isSameDay(day.date, thursday) ||
+          isAfter(day.date, thursday)
       )
       .map(({ date, workEntries }) =>
         workEntries.map(entry => this.transformEntry(entry, date))
@@ -101,13 +107,13 @@ export class JiraApiConnector implements IApiConnector {
     return {
       comment: entry.description,
       issue: {
-        key: entry.ticketId
+        key: entry.ticketId,
       },
       author: {
-        name: this.credentials.username
+        name: this.credentials.username,
       },
       timeSpentSeconds: differenceInSeconds(entry.endTime, entry.startTime),
-      dateStarted: dateWithMinutes
+      dateStarted: dateWithMinutes,
     };
   };
 

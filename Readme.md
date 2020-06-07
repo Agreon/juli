@@ -18,6 +18,7 @@ $ juli <timesheet-file> [Params]
 **Params**
 
 - `-s`: Save the credentials entered in the home directory for the next use.
+- `-a`: Sync every day in the timesheet file, ignoring the default of one week.
 
 ### Syntax of the Timesheet
 

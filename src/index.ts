@@ -36,9 +36,14 @@ export const execute = async () => {
       "Save the user credentials in the home directory",
       false
     )
-    .action(async (file: string, obj: any) => {
+    .option(
+      "-a, --syncAll",
+      "Sync every day in the timesheet file, ignoring the default of one week",
+      false
+    )
+    .action(async (file: string, { saveCredentials, syncAll }: any) => {
       executed = true;
-      const connector = new JiraApiConnector(obj.saveCredentials);
+      const connector = new JiraApiConnector(saveCredentials, syncAll);
       try {
         const fileContent = readFileSync(file, "utf8");
         const dates = Parser.parse(fileContent);
