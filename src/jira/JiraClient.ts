@@ -43,7 +43,7 @@ export class JiraClient {
   public async obtainCookie() {
     const axiosInstance = axios.create({
       validateStatus: status => status === 200,
-      timeout: 10000
+      timeout: 10000,
     });
 
     try {
@@ -69,7 +69,7 @@ export class JiraClient {
       return {
         id: res.data.id,
         issueId: res.data.issue.key,
-        date: res.data.dateStarted
+        date: res.data.dateStarted,
       };
     } catch (e) {
       handleError(
@@ -102,8 +102,8 @@ export class JiraClient {
     return {
       headers: {
         "Content-Type": "application/json",
-        Cookie: this.cookie
-      }
+        Cookie: this.cookie,
+      },
     };
   }
 }

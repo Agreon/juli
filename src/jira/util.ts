@@ -30,7 +30,7 @@ export async function executeTasks<TRET_VAL>(
   const progressBar = new SingleBar(
     {
       format: "[{bar}] {percentage}% || {value}/{total}",
-      hideCursor: true
+      hideCursor: true,
     },
     Presets.legacy
   );

@@ -24,7 +24,7 @@ export class JiraStore implements IStore<IJiraCredentials, IJiraWorklog> {
   public getCredentials(): IJiraCredentials | null {
     return fs.readJsonSync(CREATE_PATH(CREDENTIALS_FILE), {
       encoding: "UTF-8",
-      throws: false
+      throws: false,
     });
   }
 
@@ -36,12 +36,12 @@ export class JiraStore implements IStore<IJiraCredentials, IJiraWorklog> {
     return fs
       .readJsonSync(CREATE_PATH(WORKLOGS_FILE), {
         encoding: "UTF-8",
-        throws: false
+        throws: false,
       })
       ?.map((entry: any) => ({
         id: entry.id,
         issueId: entry.issueId,
-        date: new Date(entry.date)
+        date: new Date(entry.date),
       }));
   }
 

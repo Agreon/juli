@@ -20,7 +20,7 @@ export class Parser {
 
       return {
         date,
-        workEntries: this.parseDay(date, day)
+        workEntries: this.parseDay(date, day),
       };
     });
   }
@@ -67,10 +67,7 @@ export class Parser {
           }
         } else {
           ticketId = parts[0].replace("+", "").trim();
-          description = parts
-            .slice(1)
-            .join(":")
-            .trim();
+          description = parts.slice(1).join(":").trim();
         }
 
         continue;
@@ -81,7 +78,7 @@ export class Parser {
         startTime,
         endTime,
         ticketId,
-        description
+        description,
       });
 
       // end time is start time of next
