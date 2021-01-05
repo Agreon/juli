@@ -34,7 +34,7 @@
     "typescript": "^3.7.4"
   },
   "dependencies": {
-    "axios": "^0.19.1",
+    "axios": "^0.21.1",
     "chalk": "^3.0.0",
     "cli-progress": "^3.5.0",
     "commander": "^4.0.1",
